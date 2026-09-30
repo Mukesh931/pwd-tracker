@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PWD Electrical Works – Work Progress Tracker</title>
+<link rel="stylesheet" href="css/app.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2312314f'/><path d='M17 4 8 18h6l-1 10 9-14h-6z' fill='%23f2b134'/></svg>">
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">⚡</div>
+      <div class="brand-txt">
+        <b>PWD Electrical</b>
+        <span>Work Progress Tracker</span>
+      </div>
+    </div>
+
+    <nav id="nav">
+      <a href="#/dashboard" data-view="dashboard"><i>▦</i><span>Dashboard</span></a>
+      <a href="#/works" data-view="works"><i>▤</i><span>Works Ledger</span><em id="navCount">0</em></a>
+      <a href="#/work/new" data-view="workform"><i>＋</i><span>Add / Edit Work</span></a>
+      <a href="#/bills" data-view="bills"><i>₹</i><span>Bills &amp; Payments</span><em id="navBills">0</em></a>
+      <a href="#/milestones" data-view="milestones"><i>◷</i><span>Milestone Tracker</span><em id="navMs">0</em></a>
+      <a href="#/alerts" data-view="alerts"><i>⚠</i><span>Alerts &amp; Reminders</span><em id="navAlerts" class="badge-red">0</em></a>
+      <a href="#/reports" data-view="reports"><i>⎙</i><span>Reports (PDF / Excel)</span></a>
+      <a href="#/import" data-view="import"><i>⇪</i><span>Import Data</span></a>
+      <a href="#/settings" data-view="settings"><i>⚙</i><span>Settings &amp; Masters</span></a>
+      <a href="#/logs" data-view="logs"><i>≡</i><span>Audit Log</span></a>
+      <a href="#/help" data-view="help"><i>?</i><span>Help &amp; Shortcuts</span></a>
+    </nav>
+
+    <div class="side-foot">
+      <div class="db-pill" id="dbPill" title="Database status">● <span>connected</span></div>
+      <button class="btn tiny ghost" id="btnBackup" title="Download full JSON backup">⤓ Backup</button>
+      <div class="ver">v1.0.0 • Nashik District</div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main id="main">
+    <header id="topbar">
+      <button id="navToggle" class="icon-btn" title="Toggle sidebar">☰</button>
+      <div class="crumb" id="crumb">Dashboard</div>
+      <div class="grow"></div>
+      <div class="search-wrap">
+        <input id="globalSearch" type="search" placeholder="Search work name / est no / contractor / village…  (Ctrl+K)" autocomplete="off">
+        <div id="searchDrop" class="search-drop hidden"></div>
+      </div>
+      <button class="btn ghost icon-only" id="btnPrint" title="Print current view">⎙</button>
+      <button class="btn ghost icon-only" id="btnTheme" title="Toggle dark mode">◐</button>
+      <button class="btn primary" id="btnNewWork" title="Add new work (N)">＋ New Work</button>
+    </header>
+
+    <div id="filterBar" class="filter-bar"></div>
+    <section id="view" class="view"></section>
+
+    <footer id="footbar">
+      <span id="footLeft">Ready.</span>
+      <span class="grow"></span>
+      <span id="footRight"></span>
+    </footer>
+  </main>
+</div>
+
+<!-- ============ MODAL ============ -->
+<div id="modal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head">
+      <b id="modalTitle">Title</b>
+      <button class="icon-btn" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"></div>
+  </div>
+</div>
+
+<div id="toasts" class="toasts"></div>
+<div id="loader" class="loader hidden"><div class="spin"></div><span id="loaderTxt">Working…</span></div>
+
+<script src="js/util.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
