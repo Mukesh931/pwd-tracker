@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PWD Electrical Works Tracker – Nashik | Project Site</title>
+<meta name="description" content="Work-progress tracker for Public Works Department (Electrical) Nashik: taluka-wise ledger, RAG flags, bill & milestone tracking, Marathi+English PDF/Excel reports.">
+<style>
+  :root{--navy:#12314f;--navy2:#0c2237;--accent:#f2b134;--ink:#16202b;--mut:#5b6b7c;--bg:#f5f8fc;--card:#fff;--line:#dfe6ee;--green:#1b6b34;--red:#c0392b}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,'Noto Sans',sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+  header{background:linear-gradient(135deg,var(--navy2),var(--navy) 60%,#1c4670);color:#fff;padding:56px 20px 64px;text-align:center}
+  header .gov{font-size:13px;letter-spacing:.14em;opacity:.85;text-transform:uppercase}
+  header h1{font-size:clamp(26px,4.4vw,44px);margin:10px 0 4px;font-weight:800}
+  header .mr{font-size:clamp(17px,2.6vw,24px);color:var(--accent);font-weight:700;margin-bottom:10px}
+  header p.sub{max-width:760px;margin:0 auto;font-size:15px;opacity:.92}
+  .pills{margin-top:20px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:5px 14px;font-size:12.5px}
+  .cta{margin-top:26px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn{display:inline-block;padding:11px 22px;border-radius:8px;font-weight:700;text-decoration:none;font-size:14.5px}
+  .btn.gold{background:var(--accent);color:#20180a}
+  .btn.ghost{border:1.5px solid rgba(255,255,255,.55);color:#fff}
+  main{max-width:1080px;margin:-34px auto 0;padding:0 18px 60px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;box-shadow:0 6px 18px rgba(18,49,79,.07)}
+  .card h3{color:var(--navy);font-size:15px;margin-bottom:6px}
+  .card p{font-size:13.5px;color:var(--mut)}
+  section{margin-top:46px}
+  h2{color:var(--navy);font-size:22px;border-left:5px solid var(--accent);padding-left:10px;margin-bottom:16px}
+  .shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+  figure{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  figure img{width:100%;display:block;border-bottom:1px solid var(--line)}
+  figcaption{padding:10px 12px;font-size:12.8px;color:var(--mut)}
+  figcaption b{color:var(--ink)}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13.5px}
+  th{background:var(--navy);color:#fff;text-align:left;padding:9px 12px;font-size:12.5px}
+  td{padding:9px 12px;border-top:1px solid var(--line);vertical-align:top}
+  code,pre{font-family:Consolas,Menlo,monospace;font-size:13px}
+  pre{background:var(--navy2);color:#dfe9f5;padding:14px 16px;border-radius:10px;overflow:auto;margin:10px 0}
+  .note{background:#fff7e6;border:1px solid #f0d9a8;border-radius:10px;padding:12px 16px;font-size:13.5px;margin-top:14px}
+  ul{margin:8px 0 8px 20px;font-size:14px}
+  li{margin:4px 0}
+  footer{background:var(--navy2);color:#c7d4e2;text-align:center;padding:26px 16px;font-size:13px}
+  a{color:#1c5fa8}
+  .tag{display:inline-block;background:#e8f0fa;color:var(--navy);border-radius:6px;padding:1px 8px;font-size:12px;font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <div class="gov">महाराष्ट्र शासन / Government of Maharashtra • Public Works Department (Electrical), Nashik</div>
+  <h1>PWD Electrical Works – Work Progress Tracker</h1>
+  <div class="mr">सार्वजनिक बांधकाम विभाग (विद्युत) – काम प्रगती ट्रॅकर</div>
+  <p class="sub">A full-stack tracker for electrical works: taluka-wise ledger, Head-of-Account details,
+     automated RAG / delay / bill-ageing flags, milestone &amp; document checklists, dashboards and
+     government-format <b>Marathi + English PDF &amp; Excel reports</b>.</p>
+  <div class="pills">
+    <span class="pill">Node.js 20 + Express</span><span class="pill">SQLite (single-file DB)</span>
+    <span class="pill">PDFKit · Devanagari PDFs</span><span class="pill">ExcelJS live-formula workbooks</span>
+    <span class="pill">Vanilla-JS SPA · no build step</span>
+  </div>
+  <div class="cta">
+    <a class="btn gold" href="https://github.com/Mukesh931/pwd-tracker">⬇ Get the code (GitHub repo)</a>
+    <a class="btn ghost" href="https://github.com/Mukesh931/pwd-tracker/blob/main/USER-GUIDE.md">📖 User guide</a>
+    <a class="btn ghost" href="https://github.com/Mukesh931/pwd-tracker/blob/main/deploy/DEPLOY-DOMAIN.md">🌐 Publish on a domain</a>
+  </div>
+</header>
+<main>
+  <div class="cards">
+    <div class="card"><h3>🗂 Taluka-wise ledger</h3><p>All 15 Nashik-district talukas, grouped &amp; filterable; Head of Account, AA/Est amounts, bill &amp; work status per work.</p></div>
+    <div class="card"><h3>🤖 Auto-computation engine</h3><p>Balance, utilisation, delay days, auto bill status, stalled &amp; overdue flags and RAG rating recalculated on every save.</p></div>
+    <div class="card"><h3>📈 Tracking tools</h3><p>Dashboard KPIs &amp; charts, alerts centre, bill register with ageing, global milestone tracker, document checklists.</p></div>
+    <div class="card"><h3> Reports</h3><p>10 PDFs with govt letterhead &amp; signature blocks, 9 Excel workbooks with live formulas, CSV export — all honour filters.</p></div>
+    <div class="card"><h3>📥 Import your register</h3><p>Upload Excel/CSV or paste text; Marathi headers (कामाचे नाव, तालुका, लेखाशिर्षक…) auto-mapped with preview &amp; validation.</p></div>
+    <div class="card"><h3>🔒 Safe by design</h3><p>Recycle bin, audit log, JSON backup/restore; your data stays in one SQLite file on your own machine or server.</p></div>
+  </div>
+
+  <section>
+    <h2>Sample report output (generated by this code)</h2>
+    <div class="shots">
+      <figure><img src="report-samples/pdf-progress-statement.png" alt="Work progress statement PDF page 1">
+        <figcaption><b>Work Progress Statement</b> — letterhead (Marathi+English), KPI strip, taluka-grouped ledger with RAG colours.</figcaption></figure>
+      <figure><img src="report-samples/pdf-summary-signature.png" alt="Summary and signature block">
+        <figcaption><b>Summary + signature block</b> — completed/ongoing/delayed/stalled roll-ups, dual signature lines.</figcaption></figure>
+      <figure><img src="report-samples/pdf-work-dossier.png" alt="Work dossier page 1">
+        <figcaption><b>Work dossier</b> — complete record of one work: location, head of account, sanctions, tender/WO, progress.</figcaption></figure>
+      <figure><img src="report-samples/pdf-dossier-checklists.png" alt="Dossier checklists">
+        <figcaption><b>Dossier checklists</b> — bills, 20 milestones, 19-document checklist, progress history.</figcaption></figure>
+      <figure><img src="report-samples/pdf-bill-status.png" alt="Bill status report">
+        <figcaption><b>Bill Status Report</b> — register with ageing days + status-wise summary totals.</figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>Run it in 4 commands (offline, single user)</h2>
+    <pre>git clone https://github.com/Mukesh931/pwd-tracker.git
+cd pwd-tracker
+npm install        # once, needs internet (Node.js 20+)
+npm start          # then open  http://localhost:3000</pre>
+    <p style="font-size:14px;color:var(--mut)">Works fully offline afterwards. Sample Nashik data loads with one click
+      (Settings ▸ Data); reset to empty and enter your own works via the UI or Import.</p>
+    <div class="note"><b>Note:</b> this web page is the project <i>showcase</i>. The tracker itself is a live
+      Node.js application (it writes data and generates PDFs server-side), so it runs on your PC/server —
+      not inside GitHub Pages. Free online publishing options (office-PC Cloudflare tunnel, VPS, cloud PaaS)
+      are documented in <a href="https://github.com/Mukesh931/pwd-tracker/blob/main/deploy/DEPLOY-DOMAIN.md">deploy/DEPLOY-DOMAIN.md</a>.</div>
+  </section>
+
+  <section>
+    <h2>What's inside</h2>
+    <table>
+      <tr><th style="width:32%">Module</th><th>Highlights</th></tr>
+      <tr><td><span class="tag">server.js</span> Express 5 API</td><td>~60 endpoints: works/children CRUD, quick &amp; bulk update, recompute, recycle bin, import preview/commit, backup/restore, audit log, report streaming.</td></tr>
+      <tr><td><span class="tag">lib/db.js</span> SQLite layer</td><td>Schema + invariants (no NULL numerics), recompute engine: RAG, delays, bill ageing, auto statuses, milestone/document flags.</td></tr>
+      <tr><td><span class="tag">lib/pdf.js</span> PDFKit</td><td>Devanagari font embedding, mixed-script text runs, auto-scaled tables, letterhead, KPI strips, signature blocks, page x of y.</td></tr>
+      <tr><td><span class="tag">lib/xlsx.js</span> ExcelJS</td><td>Master ledger with live formulas, dropdowns, conditional formatting; 9 workbook builders with COUNTIF/SUMIF summary sheets.</td></tr>
+      <tr><td><span class="tag">public/</span> SPA</td><td>Dashboard, ledger, work dossier tabs, bills, milestones, alerts, reports hub, import wizard, settings, logs — zero-dependency vanilla JS.</td></tr>
+      <tr><td><span class="tag">deploy/</span> Ops kit</td><td>VPS one-shot script (nginx + pm2 + Let's Encrypt), Caddyfile, Cloudflare Tunnel playbook, domain &amp; Docker guides.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Documentation</h2>
+    <ul>
+      <li><a href="https://github.com/Mukesh931/pwd-tracker#readme">README</a> — features, API surface, code map.</li>
+      <li><a href="https://github.com/Mukesh931/pwd-tracker/blob/main/USER-GUIDE.md">USER-GUIDE.md</a> — day-to-day working guide (entry, updates, monitoring, reports, backups).</li>
+      <li><a href="https://github.com/Mukesh931/pwd-tracker/blob/main/DEPLOYMENT.md">DEPLOYMENT.md</a> — offline install, VPS / PaaS / Docker publishing.</li>
+      <li><a href="https://github.com/Mukesh931/pwd-tracker/blob/main/deploy/CLOUDFLARE-TUNNEL.md">deploy/CLOUDFLARE-TUNNEL.md</a> — ₹0/month public HTTPS URL from your office PC.</li>
+    </ul>
+  </section>
+</main>
+<footer>
+  PWD Electrical Works Tracker v1.0.0 • project site hosted on GitHub Pages •
+  code &amp; issues: <a style="color:#f2b134" href="https://github.com/Mukesh931/pwd-tracker">github.com/Mukesh931/pwd-tracker</a>
+</footer>
+</body>
+</html>
