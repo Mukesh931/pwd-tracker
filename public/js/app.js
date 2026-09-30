@@ -28,10 +28,48 @@
   const setFilters = (f) => { S.filters = Object.assign({}, f); };
   const fqs = () => U.qs(S.filters);
 
+  /* ==================== LOGIN ==================== */
+  function renderLogin() {
+    document.body.classList.add('noauth');
+    const host = $('#view') || $('#main');
+    host.innerHTML = '';
+    const wrap = el('div', { class: 'login-wrap' });
+    wrap.innerHTML = `
+      <form class="login-card" id="loginForm">
+        <div class="login-em">🏛</div>
+        <b class="login-t1">सार्वजनिक बांधकाम विभाग (विद्युत) – नाशिक</b>
+        <span class="login-t2">Public Works Department (Electrical), Nashik</span>
+        <span class="login-t3">Work Progress Tracker — sign in / साइन इन करा</span>
+        <label>Username / वापरकर्ता<input id="loginUser" autocomplete="username" required></label>
+        <label>Password / पासवर्ड<input id="loginPass" type="password" autocomplete="current-password" required></label>
+        <div id="loginErr" class="login-err hidden"></div>
+        <button class="btn primary" id="loginBtn" type="submit">Sign in / प्रवेश करा</button>
+        <span class="login-hint small muted">First-run default: admin / admin123 — change it in Settings ▸ Security.</span>
+      </form>`;
+    host.appendChild(wrap);
+    $('#loginForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const errEl = $('#loginErr'); errEl.classList.add('hidden');
+      $('#loginBtn').disabled = true;
+      try {
+        const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: $('#loginUser').value, password: $('#loginPass').value }) });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.error || 'Login failed');
+        document.body.classList.remove('noauth');
+        await boot();
+      } catch (er) { errEl.textContent = er.message; errEl.classList.remove('hidden'); }
+      const btnAgain = $('#loginBtn'); if (btnAgain) btnAgain.disabled = false;
+    };
+    setTimeout(() => { const u = $('#loginUser'); if (u) u.focus(); }, 60);
+  }
+
   /* ==================== BOOT ==================== */
   async function boot() {
     loading(true, 'Loading application…');
     try {
+      const ses = await fetch('/api/session').then(r => (r.ok ? r.json() : null)).catch(() => null);
+      if (!ses || !ses.data || !ses.data.user) { loading(false); renderLogin(); return; }
+      S.user = ses.data.user; S.defaultPw = ses.data.default_password;
       const meta = await U.get('/api/meta');
       S.meta = meta.data; S.masters = meta.data.masters; S.letterhead = meta.data.letterhead;
       S.rules = meta.data.rules; S.reports = meta.data.reports;
@@ -1906,6 +1944,29 @@
     const st = r.data;
     const accs = el('div');
 
+    /* security / login credentials */
+    const a0 = el('div', { class: 'acc open' });
+    a0.innerHTML = `<div class="acc-h"><b>0 ▸ Login & Security (username / password)</b><span class="caret">▸</span></div>`;
+    const b0 = el('div', { class: 'card-b' });
+    if (st.auth && st.auth.default_password) b0.appendChild(el('div', { class: 'note-warn', html: '⚠ You are still using the default password <b>admin123</b>. Change it below before publishing the app online.' }));
+    const sg = el('div', { class: 'form-grid' });
+    const mkIn = (id, lbl, type, val, cls) => { const d = el('div', { class: 'fld ' + (cls || '') }); d.innerHTML = `<label>${lbl}</label>`; const i = el('input', { id, type }); if (val) i.value = val; d.appendChild(i); return d; };
+    sg.appendChild(mkIn('secUser', 'Username', 'text', st.auth ? st.auth.user : 'admin', 'c4'));
+    sg.appendChild(mkIn('secCur', 'Current password', 'password', '', 'c4'));
+    sg.appendChild(mkIn('secNew', 'New password (min 6 chars, blank = keep)', 'password', '', 'c4'));
+    b0.appendChild(sg);
+    const srow = el('div', { style: { marginTop: '10px' } });
+    const sbtn = el('button', { class: 'btn primary', text: '💾 Update credentials' });
+    sbtn.onclick = async () => {
+      const body = { current: $('#secCur').value, username: $('#secUser').value };
+      if ($('#secNew').value) body.password = $('#secNew').value;
+      try { const rr = await U.put('/api/auth', body); toast(rr.message || 'Updated', 'ok'); setTimeout(() => location.reload(), 900); }
+      catch (e) { toast(e.message, 'err'); }
+    };
+    srow.appendChild(sbtn);
+    b0.appendChild(srow);
+    a0.appendChild(b0); accs.appendChild(a0);
+
     /* letterhead */
     const a1 = el('div', { class: 'acc open' });
     a1.innerHTML = `<div class="acc-h"><b>1 ▸ Report Letterhead & Signature Block (used on every PDF)</b><span class="caret">▸</span></div>`;
@@ -2166,6 +2227,11 @@
     if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
     $('#btnPrint').onclick = () => U.printView(document.title);
     $('#btnBackup').onclick = () => U.download('/api/backup');
+    if (!$('#btnLogout')) {
+      const lb = el('button', { class: 'btn tiny ghost', id: 'btnLogout', text: '⎋ Logout' });
+      lb.onclick = async () => { await fetch('/api/logout', { method: 'POST' }); location.reload(); };
+      $('#btnBackup').parentNode.insertBefore(lb, $('#btnBackup'));
+    }
     $('#modalClose').onclick = closeModal;
     $('#modal').addEventListener('click', (e) => { if (e.target.id === 'modal') closeModal(); });
 

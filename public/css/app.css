@@ -322,3 +322,22 @@ pre.code{background:#0f1c28;color:#cfe3f5;padding:11px;border-radius:8px;overflo
   table.tbl th{position:static;background:#12314f!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   @page{size:A4 landscape;margin:10mm}
 }
+
+/* ================= login & security ================= */
+body.noauth #sidebar, body.noauth #topbar { display: none !important; }
+body.noauth #main { margin: 0 !important; padding: 0 !important; }
+body.noauth #view { padding: 0 !important; }
+body.noauth .login-wrap { min-height: 100vh; }
+.login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #0c2237, #12314f 60%, #1c4670); padding: 20px; }
+.login-card { background: #fff; border-radius: 14px; padding: 30px 34px; width: 400px; max-width: 94vw;
+  display: flex; flex-direction: column; gap: 10px; box-shadow: 0 20px 60px rgba(0,0,0,.35); text-align: center; }
+.login-em { font-size: 34px; }
+.login-t1 { color: #12314f; font-size: 16px; }
+.login-t2 { color: #5b6b7c; font-size: 12.5px; }
+.login-t3 { color: #b07a10; font-weight: 700; font-size: 13px; margin-bottom: 6px; }
+.login-card label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #5b6b7c; text-align: left; }
+.login-card input { border: 1px solid #dfe6ee; border-radius: 8px; padding: 9px 11px; font-size: 14px; background: #fff; color: #16202b; }
+.login-err { background: #fdecea; color: #c0392b; border-radius: 8px; padding: 7px 10px; font-size: 12.5px; }
+.login-hint { margin-top: 4px; }
+.note-warn { background: #fff7e6; border: 1px solid #f0d9a8; border-radius: 8px; padding: 9px 12px; font-size: 12.5px; margin-bottom: 10px; }

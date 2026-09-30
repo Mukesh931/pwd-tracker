@@ -10,6 +10,10 @@ Settings · Logs · Help**.
 
 ## A. First run (one time)
 
+0. **Sign in** — the app opens a login screen (Marathi + English). First-run credentials are
+   **admin / admin123**. Immediately after signing in go to **Settings ▸ Security** and change the
+   password (and username if you like). Until you change it, a yellow warning is shown in Settings.
+   Sessions last 12 hours; use **⎋ Logout** (bottom-left) on shared computers.
 1. The app opens with **31 sample Nashik works** so you can explore safely.
 2. To start with a **completely empty database**: Settings ▸ Data ▸ *Reset database* (or
    `POST /api/reset`). To reload samples later: Settings ▸ Data ▸ *Load sample data*.

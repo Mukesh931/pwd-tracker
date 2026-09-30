@@ -23,6 +23,11 @@ Nashik district. Marathi + English throughout (Devanagari renders in the UI **an
 
 ## 1. What the app does
 
+### Login & security
+- **Username / password sign-in** (scrypt-hashed password, HttpOnly session cookie, 12-h sessions).
+- First-run credentials: **admin / admin123** — change in **Settings ▸ Security** (a warning banner
+  shows while the default password is active). Every API route and report export is behind the login.
+
 ### Data entry (you type your own works)
 - **Works ▸ New Work** – full form: work name (En + Mr), Est number/year, **AA amount, Est (TS) amount**,
   revised est, **Head of Account** + head description/type/budget head, fund source, scheme, taluka /

@@ -4,6 +4,7 @@
    REST API + PDF/Excel report endpoints + import engine
    ============================================================ */
 const express = require('express');
+const crypto = require('crypto');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -23,6 +24,69 @@ const HOST = '0.0.0.0';
 app.use(express.json({ limit: '25mb' }));
 app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
+
+/* ================================================================= AUTH
+   Single/multi-user login with scrypt-hashed password + in-memory sessions.
+   Default first-run credentials: admin / admin123  (change in Settings ▸ Security) */
+const SESSIONS = new Map();           /* token -> { user, exp } */
+const SESS_HOURS = 12;
+const hashPw = (pw, salt) => crypto.scryptSync(String(pw), salt, 64).toString('hex');
+function storePw(pw) { const salt = crypto.randomBytes(16).toString('hex'); D.setSetting('auth_hash', salt + '$' + hashPw(pw, salt)); }
+function verifyPw(pw) {
+  const stored = D.getSetting('auth_hash', '');
+  const [salt, hash] = stored.split('$');
+  if (!salt || !hash) return false;
+  const h = hashPw(pw, salt);
+  return h.length === hash.length && crypto.timingSafeEqual(Buffer.from(h), Buffer.from(hash));
+}
+const sessToken = (req) => { const m = /(?:^|;\s*)pwd_sid=([^;]+)/.exec(req.headers.cookie || ''); return m && m[1]; };
+function authInit() {
+  if (!D.getSetting('auth_hash')) { storePw('admin123'); D.setSetting('auth_user', 'admin'); D.setSetting('auth_default', '1'); }
+}
+authInit();
+app.use('/api', (req, res, next) => {
+  const open = req.path === '/login' || req.path === '/logout' || req.path === '/session' || req.path === '/health';
+  if (open) return next();
+  const t = sessToken(req); const sess = t && SESSIONS.get(t);
+  if (!sess || sess.exp < Date.now()) {
+    if (t) SESSIONS.delete(t);
+    return res.status(401).json({ ok: false, error: 'Not logged in – please sign in' });
+  }
+  req.session = sess; next();
+});
+app.post('/api/login', (req, res) => {
+  const { username = '', password = '' } = req.body || {};
+  const user = D.getSetting('auth_user', 'admin');
+  if (String(username).trim() !== user || !verifyPw(password)) { D.log('LOGIN-FAIL', 'auth', '', `Failed login attempt for "${username}"`); return bad(res, 'Invalid username or password', 401); }
+  const token = crypto.randomBytes(24).toString('hex');
+  SESSIONS.set(token, { user, exp: Date.now() + SESS_HOURS * 3600e3 });
+  res.setHeader('Set-Cookie', `pwd_sid=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${SESS_HOURS * 3600}`);
+  D.log('LOGIN', 'auth', '', `Signed in: ${user}`);
+  ok(res, { user });
+});
+app.post('/api/logout', (req, res) => {
+  const t = sessToken(req); if (t) SESSIONS.delete(t);
+  res.setHeader('Set-Cookie', 'pwd_sid=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0');
+  D.log('LOGOUT', 'auth', '', 'Signed out');
+  ok(res, null, { message: 'Signed out' });
+});
+app.get('/api/session', (req, res) => {
+  const t = sessToken(req); const sess = t && SESSIONS.get(t);
+  if (!sess || sess.exp < Date.now()) return res.status(401).json({ ok: false, error: 'No session' });
+  ok(res, { user: sess.user, default_password: D.getSetting('auth_default', '1') === '1' });
+});
+app.put('/api/auth', (req, res) => {
+  const { current = '', username, password } = req.body || {};
+  if (!verifyPw(current)) return bad(res, 'Current password is incorrect', 403);
+  if (username !== undefined && String(username).trim()) D.setSetting('auth_user', String(username).trim());
+  if (password !== undefined && String(password).length) {
+    if (String(password).length < 6) return bad(res, 'New password must be at least 6 characters');
+    storePw(password); D.setSetting('auth_default', '0');
+  }
+  SESSIONS.clear();
+  D.log('AUTH-CHANGE', 'auth', '', 'Login credentials updated (all sessions signed out)');
+  ok(res, null, { message: 'Credentials updated – please sign in again' });
+});
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } });
 const BACKUP_DIR = path.join(__dirname, 'data', 'backups');
@@ -365,6 +429,7 @@ app.get('/api/settings', wrap((req, res) => {
     rules: D.getJSON('rules', C.RULES),
     masters: D.masters(),
     recycle: D.db.prepare('SELECT COUNT(*) c FROM works WHERE COALESCE(is_deleted,0)=1').get().c,
+    auth: { user: D.getSetting('auth_user', 'admin'), default_password: D.getSetting('auth_default', '1') === '1' },
   });
 }));
 app.put('/api/settings', wrap((req, res) => {
