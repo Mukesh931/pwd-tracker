@@ -30,11 +30,13 @@
         ang = a2; return;
       }
       const large = frac > 0.5 ? 1 : 0;
-      const p1 = [r + r * Math.cos(ang), r + r * Math.sin(ang)];
-      const p2 = [r + r * Math.cos(a2), r + r * Math.sin(a2)];
-      const p3 = [r + ir * Math.cos(a2), r + ir * Math.sin(a2)];
-      const p4 = [r + ir * Math.cos(ang), r + ir * Math.sin(ang)];
-      paths += `<path d="M${p1} L${p2} A${r},${r} 0 ${large} 1 ${p3} L${p4} A${ir},${ir} 0 ${large} 0 ${p1} Z"
+      const f = (n) => Math.round(n * 100) / 100;
+      const p1 = [f(r + r * Math.cos(ang)), f(r + r * Math.sin(ang))];   /* outer start */
+      const p2 = [f(r + r * Math.cos(a2)), f(r + r * Math.sin(a2))];     /* outer end   */
+      const p3 = [f(r + ir * Math.cos(a2)), f(r + ir * Math.sin(a2))];   /* inner end   */
+      const p4 = [f(r + ir * Math.cos(ang)), f(r + ir * Math.sin(ang))]; /* inner start */
+      /* outer arc (sweep 1) -> radial line in -> inner arc back (sweep 0) -> close */
+      paths += `<path d="M${p1} A${r},${r} 0 ${large} 1 ${p2} L${p3} A${ir},${ir} 0 ${large} 0 ${p4} Z"
         fill="${c}" stroke="#fff" stroke-width="1.4"><title>${U.esc(it.label)}: ${U.fmtNum(v, 0)} (${(frac * 100).toFixed(1)}%)</title></path>`;
       const mid = (ang + a2) / 2;
       if (frac > 0.055) {

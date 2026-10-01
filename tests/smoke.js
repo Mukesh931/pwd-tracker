@@ -161,6 +161,10 @@ async function waitFor(fn, ms = 15000, label = '') {
   const donutHtml = win.eval("Charts.donut([{label:'solo',value:5}],{})");
   ok(/fill-rule="evenodd"/.test(donutHtml), 'single-segment donut draws full ring (even-odd path)');
   ok(!/A95,95 0 1 1 61\.2/.test(donutHtml) && /100%/.test(donutHtml), 'full-ring carries 100% label');
+  const multiHtml = win.eval("Charts.donut([{label:'a',value:8,color:'#1b6b34'},{label:'b',value:2,color:'#f2b134'},{label:'c',value:16,color:'#b3261e'}],{})");
+  const firstD = (multiHtml.match(/d="([^"]+)"/) || [])[1] || '';
+  ok(/^M[\d.\-]+,[\d.\-]+ A95,95 0 [01] 1 /.test(firstD), 'multi-segment donut: outer edge is an arc, not a chord');
+  ok((firstD.match(/A95,95/g) || []).length === 1 && (firstD.match(/A/g) || []).length === 2, 'each segment: exactly one outer arc + one inner arc');
   const r2m = await api(jar, 'POST', '/api/works', { work_name: 'Blank status work', est_number: 'Est/SMOKE/B' + Date.now(), est_year: '2025-26', taluka: 'Jalgaon', village: 'Khirdi', district: 'Jalgaon', est_amount: 500000 });
   const bwid = r2m.json && r2m.json.ok ? (r2m.json.data.id || (r2m.json.data.work && r2m.json.data.work.id)) : null;
   const rd = await api(jar, 'GET', '/api/dashboard');
