@@ -330,7 +330,7 @@
     v.appendChild(r5);
 
     /* quick summary table of talukas */
-    v.appendChild(card('Taluka Summary Table', 'sortable — click any row to open the filtered ledger', talukaTable(d.taluka)));
+    v.appendChild(card('Taluka Summary Table', 'sortable — click any row to open the filtered ledger', '', talukaTable(d.taluka)));
     bindGo(v);
   }
 

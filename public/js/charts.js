@@ -20,6 +20,15 @@
       const v = Number(it.value) || 0; if (!v) return;
       const frac = v / total, a2 = ang + frac * Math.PI * 2;
       const c = it.color || PAL[i % PAL.length];
+      if (frac > 0.9995) {
+        /* whole ring: a single 360-degree arc degenerates in SVG – draw two semicircles with an even-odd hole */
+        paths += `<path d="M${r + r},${r} A${r},${r} 0 1 1 ${r - r},${r} A${r},${r} 0 1 1 ${r + r},${r} Z ` +
+          `M${r + ir},${r} A${ir},${ir} 0 1 0 ${r - ir},${r} A${ir},${ir} 0 1 0 ${r + ir},${r} Z" ` +
+          `fill="${c}" fill-rule="evenodd" stroke="#fff" stroke-width="1.4"><title>${U.esc(it.label)}: ${U.fmtNum(v, 0)} (100%)</title></path>`;
+        paths += `<text x="${r}" y="${r - (r + ir) / 2 + 3.4}" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">100%</text>`;
+        legends += `<span><i style="background:${c}"></i>${U.esc(it.label)} <b>${opts.valueFmt ? opts.valueFmt(v) : U.fmtNum(v, 0)}</b></span>`;
+        ang = a2; return;
+      }
       const large = frac > 0.5 ? 1 : 0;
       const p1 = [r + r * Math.cos(ang), r + r * Math.sin(ang)];
       const p2 = [r + r * Math.cos(a2), r + r * Math.sin(a2)];

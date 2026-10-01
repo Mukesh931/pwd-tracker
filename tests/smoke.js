@@ -71,7 +71,7 @@ async function waitFor(fn, ms = 15000, label = '') {
   ok(arr.every(w => JALGAON_TALUKAS.includes(w.taluka)), 'every seeded work taluka in Jalgaon district');
 
   r = await api(jar, 'POST', '/api/works', {
-    work_name: 'Smoke test Jalgaon work', est_number: 'Est/SMOKE/001', est_year: '2025-26',
+    work_name: 'Smoke test Jalgaon work', est_number: 'Est/SMOKE/A' + Date.now(), est_year: '2025-26',
     taluka: 'Jalgaon', village: 'Palodhi', district: 'Jalgaon',
     division: 'P.W. Electrical Division, Dhule', sub_division: 'P.W. Electrical Sub-Division, Jalgaon',
     head_of_account: '2059 02 105', nature_of_work: 'New Building Electrification',
@@ -142,7 +142,7 @@ async function waitFor(fn, ms = 15000, label = '') {
     return true;
   };
   ok(setField('work_name', 'E2E smoke work, Jalgaon'), 'fill work_name');
-  setField('est_number', 'Est/SMOKE/E2E'); setField('est_year', '2025-26');
+  setField('est_number', 'Est/SMOKE/E2E-' + Date.now()); setField('est_year', '2025-26');
   setField('taluka', 'Jalgaon'); setField('village', 'Khirdi'); setField('district', 'Jalgaon');
   setField('division', 'P.W. Electrical Division, Dhule');
   setField('sub_division', 'P.W. Electrical Sub-Division, Jalgaon');
@@ -156,6 +156,23 @@ async function waitFor(fn, ms = 15000, label = '') {
   await waitFor(() => /E2E smoke work/.test(win.document.body.textContent), 10000, 'detail shows saved work');
   ok(/E2E smoke work, Jalgaon/.test(win.document.body.textContent), 'detail page shows the saved work');
   ok(/Dhule/.test(win.document.body.textContent), 'detail page shows Dhule division');
+
+  /* dashboard regressions: donut full-ring, taluka table element, blank-status stage */
+  const donutHtml = win.eval("Charts.donut([{label:'solo',value:5}],{})");
+  ok(/fill-rule="evenodd"/.test(donutHtml), 'single-segment donut draws full ring (even-odd path)');
+  ok(!/A95,95 0 1 1 61\.2/.test(donutHtml) && /100%/.test(donutHtml), 'full-ring carries 100% label');
+  const r2m = await api(jar, 'POST', '/api/works', { work_name: 'Blank status work', est_number: 'Est/SMOKE/B' + Date.now(), est_year: '2025-26', taluka: 'Jalgaon', village: 'Khirdi', district: 'Jalgaon', est_amount: 500000 });
+  const bwid = r2m.json && r2m.json.ok ? (r2m.json.data.id || (r2m.json.data.work && r2m.json.data.work.id)) : null;
+  const rd = await api(jar, 'GET', '/api/dashboard');
+  const dd = rd.json && (rd.json.data.dashboard || rd.json.data);
+  const stageNS = dd && dd.stage && dd.stage.find(s => s.label === 'Estimate under Preparation');
+  ok(stageNS && stageNS.count >= 1, 'blank work_status lands in first life-cycle stage bucket');
+  win.location.hash = '#/'; win.dispatchEvent(new win.HashChangeEvent('hashchange'));
+  await waitFor(() => /Taluka Summary Table/.test(win.document.body.textContent), 15000, 'dashboard render');
+  ok(!/\[object HTMLDivElement\]/.test(win.document.body.textContent), 'no [object HTMLDivElement] leak on dashboard');
+  const sumTbl = [...win.document.querySelectorAll('.card')].find(c => /Taluka Summary Table/.test(c.textContent));
+  ok(sumTbl && sumTbl.querySelector('table.tbl tbody tr'), 'taluka summary table renders rows');
+  if (bwid) await api(jar, 'DELETE', '/api/works/' + bwid);
 
   /* cleanup the e2e work */
   const id = Number((win.location.hash.match(/#\/work\/(\d+)/) || [])[1]);
