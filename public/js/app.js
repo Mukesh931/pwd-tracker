@@ -24,7 +24,13 @@
   S.ledger.cols = JSON.parse(localStorage.getItem('ledger_cols') || 'null') || DEF_COLS;
   const saveCols = () => localStorage.setItem('ledger_cols', JSON.stringify(S.ledger.cols));
 
-  const M = () => S.masters || {};
+  const arrList = (x) => Array.isArray(x) ? x
+    : (typeof x === 'string' && x.trim() ? x.split(/\n+|,+/).map(t => t.trim()).filter(Boolean) : []);
+  const M = () => {
+    const m = Object.assign({}, S.masters || {});
+    Object.keys(m).forEach(k => { m[k] = arrList(m[k]); });
+    return m;
+  };
   const setFilters = (f) => { S.filters = Object.assign({}, f); };
   const fqs = () => U.qs(S.filters);
 
@@ -120,10 +126,18 @@
     const fn = VIEWS[S.route.view] || vDashboard;
     renderFilterBar();
     try { await fn(S.route.param); }
-    catch (e) { console.error(e); $('#view').innerHTML = `<div class="card"><div class="card-b"><div class="empty"><span class="e-i">⚠</span>${esc(e.message)}</div></div></div>`; }
+    catch (e) {
+      console.error(e);
+      $('#view').innerHTML = `<div class="card"><div class="card-b"><div class="empty"><span class="e-i">⚠</span>
+        <b>This screen could not be displayed</b><br><span class="small mono">${esc(e.message)}</span><br><br>
+        <button class="btn primary" onclick="location.reload()">Reload page</button>
+        <button class="btn" onclick="window.dispatchEvent(new HashChangeEvent('hashchange'))">Retry</button></div></div></div>`;
+    }
     $('#view').scrollTop = 0; window.scrollTo(0, 0);
   }
   const go = (h) => { location.hash = h; };
+  window.addEventListener('error', (e) => { try { toast('⚠ ' + (e.message || 'Unexpected error – please note what you clicked'), 'err'); } catch (_) {} });
+  window.addEventListener('unhandledrejection', (e) => { try { toast('⚠ ' + ((e.reason && e.reason.message) || 'Unexpected error – please note what you clicked'), 'err'); } catch (_) {} });
 
   /* ==================== FILTER BAR ==================== */
   function renderFilterBar() {
@@ -772,13 +786,14 @@
     const dl = (id, list) => el('datalist', { id }, (list || []).map(x => el('option', { value: x })));
     const frag = document.createDocumentFragment();
     frag.appendChild(dl('dl_taluka', m.talukas));
-    frag.appendChild(dl('dl_village', [...new Set(S.works.map(w => w.village).filter(Boolean))]));
+    const W = Array.isArray(S.works) ? S.works : [];
+    frag.appendChild(dl('dl_village', [...new Set(W.map(w => w.village).filter(Boolean))]));
     frag.appendChild(dl('dl_division', m.divisions));
     frag.appendChild(dl('dl_sub', m.sub_divisions));
     frag.appendChild(dl('dl_section', m.sections));
     frag.appendChild(dl('dl_nature', m.nature));
     frag.appendChild(dl('dl_fund', m.funds));
-    frag.appendChild(dl('dl_contractor', m.contractors && m.contractors.length ? m.contractors : [...new Set(S.works.map(w => w.contractor_name).filter(Boolean))]));
+    frag.appendChild(dl('dl_contractor', m.contractors && m.contractors.length ? m.contractors : [...new Set(W.map(w => w.contractor_name).filter(Boolean))]));
     frag.appendChild(dl('dl_userdept', m.user_departments));
     frag.appendChild(dl('dl_head', m.heads));
     return frag;
@@ -791,7 +806,7 @@
     bar.appendChild(el('div', { class: 'card-h', html: `<b>${f.isEdit ? 'Edit Work #' + f.id : 'Add New Work'}</b>
       <span class="sub">Fields marked <span style="color:var(--red)">*</span> are mandatory. Amounts accept <span class="mono">25L</span>, <span class="mono">2.5cr</span>, <span class="mono">2500000</span>. Derived fields are computed automatically.</span><span class="grow"></span>` }));
     const acts = el('div', { class: 'card-b', style: { display: 'flex', gap: '8px', flexWrap: 'wrap' } });
-    acts.appendChild(el('button', { class: 'btn primary', text: f.isEdit ? '💾 Save Changes' : '💾 Save Work', onclick: saveWork }));
+    acts.appendChild(el('button', { class: 'btn primary', text: f.isEdit ? '💾 Save Changes' : '💾 Save Work', onclick: () => saveWork() }));
     if (!f.isEdit) acts.appendChild(el('button', { class: 'btn', text: '💾 Save & Add Another', onclick: () => saveWork(true) }));
     acts.appendChild(el('button', { class: 'btn ghost', text: '⤓ Load Draft', onclick: loadDraft }));
     acts.appendChild(el('button', { class: 'btn ghost', text: '✎ Save Draft (browser)', onclick: saveDraft }));
@@ -968,11 +983,11 @@
     /* auto default AA = estimate */
     const aaInp = $('#f_aa_amount');
     if (aaInp && !aaInp.value.trim() && est) aaInp.placeholder = `auto: ${U.fmtNum(est)} (same as estimate)`;
+    const bal = Math.max(0, eff - paid);
+    const util = eff ? U.round(paid / eff * 100, 2) : 0;
+    const dev = rev && aa ? U.round(rev - aa, 2) : 0;
     const dp = $('#derivedPanel');
     if (dp) {
-      const bal = Math.max(0, eff - paid);
-      const util = eff ? U.round(paid / eff * 100, 2) : 0;
-      const dev = rev && aa ? U.round(rev - aa, 2) : 0;
       dp.innerHTML = `<div class="grid g6">
         ${dstat('Effective Amount', '₹ ' + U.fmtNum(eff), rev ? 'Revised estimate in force' : (aa ? 'AA amount' : 'Estimate / TS amount'))}
         ${dstat('Amount Paid', '₹ ' + U.fmtNum(paid), 'from bills or manual entry')}
@@ -1025,12 +1040,12 @@
       localStorage.removeItem('form_draft');
       await refreshMeta(); await loadWorks();
       if (again && !S.form.isEdit) { S.form = { data: { district: 'Nashik', taluka: data.taluka, division: data.division, sub_division: data.sub_division, section: data.section, head_of_account: data.head_of_account, head_desc: data.head_desc, head_type: data.head_type, fund_source: data.fund_source, est_year: data.est_year, financial_year: data.financial_year, priority: 'Medium', bill_status: 'Not Submitted' }, bills: [], milestones: [], documents: [], errors: [], isEdit: false }; renderForm(clear($('#view'))); toast('Form cleared for the next entry (common fields retained)', 'ok'); }
-      else go('#/work/' + r.data.work.id);
+      else go('#/work/' + ((r.data && (r.data.id || (r.data.work && r.data.work.id))) || ''));
     } catch (e) {
       loading(false);
       if (e.status === 409) {
         confirmBox('Duplicate estimate number', esc(e.message) + '<br><br>Save it anyway as a separate record?', async () => {
-          try { const r2 = await U.post('/api/works', Object.assign(collectForm(), { allow_duplicate: true })); toast('✓ ' + r2.message, 'ok'); go('#/work/' + r2.data.work.id); }
+          try { const r2 = await U.post('/api/works', Object.assign(collectForm(), { allow_duplicate: true })); toast('✓ ' + r2.message, 'ok'); go('#/work/' + ((r2.data && (r2.data.id || (r2.data.work && r2.data.work.id))) || '')); }
           catch (e2) { toast('✗ ' + e2.message, 'err', 6000); }
         }, 'Save anyway', 'accent');
       } else toast('✗ ' + e.message, 'err', 7000);
@@ -1161,7 +1176,8 @@
   let DET = null;
   async function vWorkDetail(param) {
     const v = clear($('#view'));
-    if (!param || param === 'new') return go('#/works');
+    if (!param) return go('#/works');
+    if (param === 'new') return go('#/workform/new');
     const id = param.replace('/edit', '');
     if (param.endsWith('/edit')) return go('#/workform/' + id);
     loading(true, 'Opening dossier…');
@@ -2221,7 +2237,7 @@
 
   /* ==================== GLOBAL BINDINGS ==================== */
   function bindGlobal() {
-    $('#btnNewWork').onclick = () => go('#/work/new');
+    $('#btnNewWork').onclick = () => go('#/workform/new');
     $('#navToggle').onclick = () => document.body.classList.toggle('side-collapsed');
     $('#btnTheme').onclick = () => { document.body.classList.toggle('dark'); localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light'); };
     if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
@@ -2265,7 +2281,7 @@
       const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); inp.focus(); inp.select(); return; }
       if (typing || e.ctrlKey || e.metaKey || e.altKey) return;
-      const map = { n: '#/work/new', d: '#/dashboard', w: '#/works', b: '#/bills', r: '#/reports', a: '#/alerts', m: '#/milestones' };
+      const map = { n: '#/workform/new', d: '#/dashboard', w: '#/works', b: '#/bills', r: '#/reports', a: '#/alerts', m: '#/milestones' };
       const k = map[e.key.toLowerCase()];
       if (k) { e.preventDefault(); go(k); }
     });
