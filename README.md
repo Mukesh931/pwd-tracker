@@ -1,7 +1,7 @@
-# PWD Electrical Works – Work Progress Tracker (Nashik)
+# PWD Electrical Works – Work Progress Tracker (Jalgaon)
 
 A full-stack work-progress tracker for **Public Works Department (Electrical)** electrical works,
-Nashik district. Marathi + English throughout (Devanagari renders in the UI **and** in exported PDFs).
+Jalgaon district — PWD Electrical Sub-Division Jalgaon, under P.W. Electrical Division, Dhule. Marathi + English throughout (Devanagari renders in the UI **and** in exported PDFs).
 
 - **Stack:** Node.js 20 + Express 5 + better-sqlite3 (single-file DB) · PDFKit (PDF) · ExcelJS (Excel) · vanilla-JS SPA (no build step)
 - **Run:** `cd pwd-tracker && npm install && npm start` → http://localhost:3000 (binds 0.0.0.0)
@@ -102,7 +102,7 @@ pwd-tracker/
   lib/agg.js       aggregations: filters, totals, group summaries, dashboard, alerts, bill/milestone trackers
   lib/pdf.js       PDFKit builders (Devanagari fonts, letterhead, tables, signature block)
   lib/xlsx.js      ExcelJS builders (formulas, validation, conditional formatting)
-  lib/seed.js      realistic Nashik sample data (31 works, 620 milestones, bills, docs, progress)
+  lib/seed.js      realistic Jalgaon sample data (26 works with milestones, bills, docs, progress)
   public/          SPA: index.html, css/app.css, js/{util,charts,app}.js  (no build step)
   assets/fonts/    Noto Sans Devanagari Regular/Bold (embedded in PDFs)
   data/            tracker.db, backups/

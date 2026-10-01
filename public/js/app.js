@@ -43,14 +43,13 @@
     wrap.innerHTML = `
       <form class="login-card" id="loginForm">
         <div class="login-em">🏛</div>
-        <b class="login-t1">सार्वजनिक बांधकाम विभाग (विद्युत) – नाशिक</b>
-        <span class="login-t2">Public Works Department (Electrical), Nashik</span>
+        <b class="login-t1">सार्वजनिक बांधकाम विभाग (विद्युत) – उपविभाग जळगाव (विभाग धुळे)</b>
+        <span class="login-t2">Public Works Department (Electrical), Sub-Division Jalgaon</span>
         <span class="login-t3">Work Progress Tracker — sign in / साइन इन करा</span>
         <label>Username / वापरकर्ता<input id="loginUser" autocomplete="username" required></label>
         <label>Password / पासवर्ड<input id="loginPass" type="password" autocomplete="current-password" required></label>
         <div id="loginErr" class="login-err hidden"></div>
         <button class="btn primary" id="loginBtn" type="submit">Sign in / प्रवेश करा</button>
-        <span class="login-hint small muted">First-run default: admin / admin123 — change it in Settings ▸ Security.</span>
       </form>`;
     host.appendChild(wrap);
     $('#loginForm').onsubmit = async (e) => {
@@ -747,7 +746,7 @@
       loading(false);
       data = r.data.work; bills = r.data.bills; milestones = r.data.milestones; documents = r.data.documents;
     } else {
-      data = Object.assign({ district: 'Nashik', work_status: '', bill_status: 'Not Submitted', physical_progress: 0,
+      data = Object.assign({ district: 'Jalgaon', work_status: '', bill_status: 'Not Submitted', physical_progress: 0,
         priority: 'Medium', utility_connection: 'Not Applied', quality_inspection: 'Not Required', mb_status: 'Pending',
         sd_status: 'Pending', est_year: (S.meta.years || []).slice(-1)[0] || '2025-26', financial_year: '' }, S.drafts || {});
     }
@@ -828,7 +827,7 @@
 
     /* --- 1 Basic --- */
     fg.appendChild(secHead(1, 'Work Identification'));
-    fg.appendChild(field('Name of Work (कामाचे नाव)', 'work_name', 'text', { span: 'c8', req: true, placeholder: 'e.g. Electrification of New Administrative Building at Nashik' }));
+    fg.appendChild(field('Name of Work (कामाचे नाव)', 'work_name', 'text', { span: 'c8', req: true, placeholder: 'e.g. Electrification of ZP School Building at Jalgaon' }));
     fg.appendChild(field('Estimate Number (अंदाज क्र.)', 'est_number', 'text', { span: 'c4', placeholder: 'Est/EE-ELEC/25-26/001', hint: 'Duplicate estimate numbers are blocked automatically' }));
     fg.appendChild(field('Work Name in Marathi', 'work_name_mr', 'text', { span: 'c5' }));
     fg.appendChild(field('Estimate Year', 'est_year', 'text', { span: 'c2', list: 'dl_year', placeholder: '2025-26' }));
@@ -837,7 +836,7 @@
 
     /* --- 2 Location --- */
     fg.appendChild(secHead(2, 'Location & Office Hierarchy'));
-    fg.appendChild(field('Taluka (तालुका)', 'taluka', 'text', { span: 'c3', req: true, list: 'dl_taluka', placeholder: 'e.g. Nashik' }));
+    fg.appendChild(field('Taluka (तालुका)', 'taluka', 'text', { span: 'c3', req: true, list: 'dl_taluka', placeholder: 'e.g. Jalgaon' }));
     fg.appendChild(field('Village / Place', 'village', 'text', { span: 'c3', list: 'dl_village' }));
     fg.appendChild(field('District', 'district', 'text', { span: 'c2', list: 'dl_district' }));
     fg.appendChild(field('Circle', 'circle', 'text', { span: 'c2', list: 'dl_circle' }));
@@ -939,9 +938,9 @@
     ['dl_year', 'dl_district', 'dl_circle', 'dl_authority', 'dl_tender', 'dl_class', 'dl_mb', 'dl_worktype'].forEach(id => {
       const list = {
         dl_year: (S.meta.years || []).concat(['2024-25', '2025-26', '2026-27']),
-        dl_district: ['Nashik', 'Ahmednagar', 'Dhule', 'Jalgaon', 'Nandurbar', 'Pune'],
-        dl_circle: m.circles || ['Nashik Circle'],
-        dl_authority: ['Executive Engineer, P.W. Electrical Division, Nashik', 'Superintending Engineer, P.W. Circle Nashik', 'Chief Engineer (Electrical), Pune', 'Collector, Nashik', 'CEO, Zilla Parishad Nashik'],
+        dl_district: ['Jalgaon', 'Dhule', 'Nashik', 'Nandurbar', 'Ahmednagar', 'Pune'],
+        dl_circle: m.circles || ['P.W. Circle, Nashik'],
+        dl_authority: ['Executive Engineer, P.W. Electrical Division, Dhule', 'Superintending Engineer, P.W. Circle, Nashik', 'Chief Engineer (Electrical), Pune', 'Collector, Jalgaon', 'CEO, Zilla Parishad, Jalgaon'],
         dl_tender: m.tender_types, dl_class: m.contractor_class, dl_mb: ['Pending', 'In Progress', 'Completed', 'Not Required'],
         dl_worktype: ['Buildings', 'Roads & Bridges', 'Water Supply / Rural', 'Irrigation', 'Other'],
       }[id] || [];
@@ -1039,7 +1038,7 @@
       toast('✓ ' + r.message, 'ok');
       localStorage.removeItem('form_draft');
       await refreshMeta(); await loadWorks();
-      if (again && !S.form.isEdit) { S.form = { data: { district: 'Nashik', taluka: data.taluka, division: data.division, sub_division: data.sub_division, section: data.section, head_of_account: data.head_of_account, head_desc: data.head_desc, head_type: data.head_type, fund_source: data.fund_source, est_year: data.est_year, financial_year: data.financial_year, priority: 'Medium', bill_status: 'Not Submitted' }, bills: [], milestones: [], documents: [], errors: [], isEdit: false }; renderForm(clear($('#view'))); toast('Form cleared for the next entry (common fields retained)', 'ok'); }
+      if (again && !S.form.isEdit) { S.form = { data: { district: 'Jalgaon', taluka: data.taluka, division: data.division, sub_division: data.sub_division, section: data.section, head_of_account: data.head_of_account, head_desc: data.head_desc, head_type: data.head_type, fund_source: data.fund_source, est_year: data.est_year, financial_year: data.financial_year, priority: 'Medium', bill_status: 'Not Submitted' }, bills: [], milestones: [], documents: [], errors: [], isEdit: false }; renderForm(clear($('#view'))); toast('Form cleared for the next entry (common fields retained)', 'ok'); }
       else go('#/work/' + ((r.data && (r.data.id || (r.data.work && r.data.work.id))) || ''));
     } catch (e) {
       loading(false);

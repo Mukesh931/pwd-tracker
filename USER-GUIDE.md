@@ -14,7 +14,7 @@ Settings · Logs · Help**.
    **admin / admin123**. Immediately after signing in go to **Settings ▸ Security** and change the
    password (and username if you like). Until you change it, a yellow warning is shown in Settings.
    Sessions last 12 hours; use **⎋ Logout** (bottom-left) on shared computers.
-1. The app opens with **31 sample Nashik works** so you can explore safely.
+1. The app opens with **26 sample Jalgaon works** so you can explore safely.
 2. To start with a **completely empty database**: Settings ▸ Data ▸ *Reset database* (or
    `POST /api/reset`). To reload samples later: Settings ▸ Data ▸ *Load sample data*.
 3. Set your office letterhead once: **Settings ▸ Letterhead** (Marathi + English lines and the two

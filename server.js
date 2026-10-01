@@ -728,10 +728,10 @@ app.get('/api/import/template.csv', wrap((req, res) => {
     ts_number: 'TS No', ts_date: 'TS Date', est_amount: 'Est Amount', contractor_name: 'Contractor', wo_number: 'WO No',
     wo_date: 'WO Date', wo_amount: 'WO Amount', target_date: 'Target Date', physical_progress: 'Physical Progress',
     amount_paid: 'Amount Paid', work_status: 'Work Status', bill_status: 'Bill Status', priority: 'Priority', remarks: 'Remarks' };
-  const sample = ['Electrification of New Administrative Building, Nashik', 'Est/EE-ELEC/25-26/001', '2025-26', 'Nashik', 'Gandhinagar',
-    '2059 02 105', 'New Building Electrification', 'State Plan (Annual Plan)', 'P.W. Electrical Division, Nashik',
-    'P.W. Electrical Sub-Division, Nashik', 'P.W. Section, Nashik City', 'AA/25-26/EE/ELEC/101', '2025-05-12', 2500000,
-    'TS/25-26/EE/ELEC/101', '2025-04-02', 2500000, 'M/s Shree Ganesh Electricals, Nashik', 'WO/25-26/EE/ELEC/101',
+  const sample = ['Electrification of ZP School Building, Jalgaon', 'Est/EE-ELEC/25-26/001', '2025-26', 'Jalgaon', 'Palodhi',
+    '2059 02 105', 'New Building Electrification', 'State Plan (Annual Plan)', 'P.W. Electrical Division, Dhule',
+    'P.W. Electrical Sub-Division, Jalgaon', 'P.W. Section, Jalgaon City', 'AA/25-26/EE/ELEC/101', '2025-05-12', 2500000,
+    'TS/25-26/EE/ELEC/101', '2025-04-02', 2500000, 'M/s Shree Eka Electricals, Jalgaon', 'WO/25-26/EE/ELEC/101',
     '2025-06-20', 2450000, '2026-06-19', 45, 900000, 'In Progress', 'Pending at Division', 'High', ''];
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename="import_template.csv"');
